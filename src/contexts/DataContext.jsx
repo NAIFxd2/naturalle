@@ -9,6 +9,9 @@ const toDb = (obj) => {
     const map = {
         fiscalId: 'fiscal_id', setorId: 'setor_id', cargoId: 'cargo_id',
         funcionarioId: 'funcionario_id', temaId: 'tema_id',
+        materialId: 'material_id', operadorId: 'operador_id',
+        numeroSerie: 'numero_serie', qtdContrato: 'qtd_contrato',
+        tipoServicoId: 'tipo_servico_id',
         createdAt: 'created_at', importedAt: 'imported_at',
         fiscalNome: 'fiscal_nome', temaNome: 'tema_nome',
         tipoServico: 'tipo_servico', estoqueMinimo: 'estoque_minimo',
@@ -29,6 +32,9 @@ const fromDb = (obj) => {
     const map = {
         fiscal_id: 'fiscalId', setor_id: 'setorId', cargo_id: 'cargoId',
         funcionario_id: 'funcionarioId', tema_id: 'temaId',
+        material_id: 'materialId', operador_id: 'operadorId',
+        numero_serie: 'numeroSerie', qtd_contrato: 'qtdContrato',
+        tipo_servico_id: 'tipoServicoId',
         created_at: 'createdAt', imported_at: 'importedAt',
         fiscal_nome: 'fiscalNome', tema_nome: 'temaNome',
         tipo_servico: 'tipoServico', estoque_minimo: 'estoqueMinimo',
