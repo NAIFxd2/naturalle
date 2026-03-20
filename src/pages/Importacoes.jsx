@@ -55,6 +55,7 @@ export default function Importacoes() {
                     uniqueFuncoes: [...new Set(rows.map(r => r[headers.indexOf('FUNÇÃO')]).filter(Boolean))],
                 });
 
+
                 setLogs([{ type: 'info', message: `Planilha "${wb.SheetNames[0]}" carregada: ${rows.length} registros encontrados`, time: new Date().toLocaleTimeString('pt-BR') }]);
             } catch (err) {
                 setLogs([{ type: 'error', message: `Erro ao ler planilha: ${err.message}`, time: new Date().toLocaleTimeString('pt-BR') }]);
@@ -69,14 +70,14 @@ export default function Importacoes() {
         setLogs([]);
 
         const { headers, rows } = preview;
-        const colMatricula = headers.indexOf('MATRÍCULA');
-        const colNome = headers.indexOf('COLABORADOR');
+        const colMatricula = headers.indexOf('CHAPA');
+        const colNome = headers.indexOf('NOME');
         const colFuncao = headers.indexOf('FUNÇÃO');
         const colFiscal = headers.indexOf('FISCAIS');
-        const colObs = headers.indexOf('OBSERVAÇÃO');
+        const colObs = -1;
 
         if (colMatricula === -1 || colNome === -1) {
-            addLog('error', 'Colunas obrigatórias não encontradas: MATRÍCULA, COLABORADOR');
+            addLog('error', 'Colunas obrigatórias não encontradas: CHAPA, NOME');
             setImporting(false);
             return;
         }
@@ -248,7 +249,7 @@ export default function Importacoes() {
             {/* Tabs */}
             <div className="tabs">
                 <button className={`tab-btn ${activeTab === 'colaboradores' ? 'active' : ''}`} onClick={() => { setActiveTab('colaboradores'); setLogs([]); setStats(null); }}>
-                    <FileSpreadsheet size={16} style={{ marginRight: 6 }} /> Colaboradores (Cubo)
+                    <FileSpreadsheet size={16} style={{ marginRight: 6 }} /> Colaboradores
                 </button>
                 <button className={`tab-btn ${activeTab === 'banco-horas' ? 'active' : ''}`} onClick={() => { setActiveTab('banco-horas'); setLogs([]); setStats(null); }}>
                     <Clock size={16} style={{ marginRight: 6 }} /> Banco de Horas
@@ -259,12 +260,12 @@ export default function Importacoes() {
             {activeTab === 'colaboradores' && (
                 <>
                     <div className="card" style={{ marginBottom: 16 }}>
-                        <div className="card-header"><h3 className="card-title"><Upload size={18} /> Upload — Cubo Atualizado</h3></div>
+                        <div className="card-header"><h3 className="card-title"><Upload size={18} /> Upload — Controle de Equipes Sistema</h3></div>
                         <div style={{ padding: 20 }}>
                             <div onClick={() => fileInputRef.current?.click()} style={{ border: '2px dashed var(--border-color)', borderRadius: 'var(--radius-lg)', padding: 40, textAlign: 'center', cursor: 'pointer', transition: 'border-color 0.2s', background: 'var(--bg-secondary)' }} onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--accent-primary)'} onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border-color)'}>
                                 <FileSpreadsheet size={48} style={{ color: 'var(--accent-primary)', marginBottom: 12 }} />
-                                <p style={{ fontSize: '1rem', fontWeight: 600, margin: '0 0 4px' }}>{file ? file.name : 'Clique para selecionar — Cubo atualizado.xlsx'}</p>
-                                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: 0 }}>Colunas: MATRÍCULA, COLABORADOR, FUNÇÃO, FISCAIS, OBSERVAÇÃO</p>
+                                <p style={{ fontSize: '1rem', fontWeight: 600, margin: '0 0 4px' }}>{file ? file.name : 'Clique para selecionar — Controle de Equipes Sistema.xlsx'}</p>
+                                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: 0 }}>Colunas: CHAPA, NOME, FUNÇÃO, FISCAIS</p>
                             </div>
                             <input ref={fileInputRef} type="file" accept=".xlsx,.xls,.csv" onChange={handleFile} style={{ display: 'none' }} />
                         </div>
