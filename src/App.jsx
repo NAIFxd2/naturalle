@@ -56,7 +56,19 @@ function AppLayout({ children, title }) {
 
 function AppRoutes() {
   const { user, loading } = useAuth();
-  const { loading: dataLoading } = useData();
+  const { loading: dataLoading, loadError } = useData();
+
+  if (loadError) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#0d1117', padding: 24 }}>
+        <div style={{ maxWidth: 600, background: '#161b22', border: '1px solid #f85149', borderRadius: 12, padding: 32, color: '#f85149' }}>
+          <h2 style={{ marginBottom: 12 }}>Erro de Conexão com o Banco</h2>
+          <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all', fontSize: '0.8rem', color: '#e6edf3', background: '#0d1117', padding: 16, borderRadius: 8 }}>{loadError}</pre>
+          <p style={{ marginTop: 16, fontSize: '0.85rem', color: '#8b949e' }}>Verifique as variáveis de ambiente VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no painel da Vercel.</p>
+        </div>
+      </div>
+    );
+  }
 
   if (loading || dataLoading) {
     return (

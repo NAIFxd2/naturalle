@@ -71,34 +71,48 @@ export function DataProvider({ children }) {
     const [permissionsConfig, setPermissionsConfigState] = useState(null);
     const [bancoHoras, setBancoHorasState] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
 
     // ===== LOAD ALL DATA ON MOUNT =====
     useEffect(() => {
         async function loadAll() {
+            const timeout = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('TIMEOUT: Supabase não respondeu em 15s. URL: ' + import.meta.env.VITE_SUPABASE_URL)), 15000)
+            );
             try {
+                const results = await Promise.race([
+                    Promise.all([
+                        supabase.from('setores').select('*').order('created_at'),
+                        supabase.from('cargos').select('*').order('created_at'),
+                        supabase.from('fiscais').select('*').order('created_at'),
+                        supabase.from('funcionarios').select('*').order('nome'),
+                        supabase.from('sys_users').select('*').order('created_at'),
+                        supabase.from('materiais').select('*').order('nome'),
+                        supabase.from('solicitacoes').select('*').order('created_at', { ascending: false }),
+                        supabase.from('presencas').select('*'),
+                        supabase.from('controle_contrato').select('*').order('created_at'),
+                        supabase.from('rocadeiras').select('*').order('created_at'),
+                        supabase.from('metas_rocadeiras').select('*'),
+                        supabase.from('tipos_servico').select('*').order('nome'),
+                        supabase.from('temas_dds').select('*').order('created_at'),
+                        supabase.from('registros_dds').select('*').order('created_at', { ascending: false }),
+                        supabase.from('banco_horas').select('*').order('nome'),
+                        supabase.from('app_config').select('*'),
+                    ]),
+                    timeout,
+                ]);
+
                 const [
-                    { data: d1 }, { data: d2 }, { data: d3 }, { data: d4 },
+                    { data: d1, error: e1 }, { data: d2 }, { data: d3 }, { data: d4 },
                     { data: d5 }, { data: d6 }, { data: d7 }, { data: d8 },
                     { data: d9 }, { data: d10 }, { data: d11 }, { data: d12 },
                     { data: d13 }, { data: d14 }, { data: d15 }, { data: d16 },
-                ] = await Promise.all([
-                    supabase.from('setores').select('*').order('created_at'),
-                    supabase.from('cargos').select('*').order('created_at'),
-                    supabase.from('fiscais').select('*').order('created_at'),
-                    supabase.from('funcionarios').select('*').order('nome'),
-                    supabase.from('sys_users').select('*').order('created_at'),
-                    supabase.from('materiais').select('*').order('nome'),
-                    supabase.from('solicitacoes').select('*').order('created_at', { ascending: false }),
-                    supabase.from('presencas').select('*'),
-                    supabase.from('controle_contrato').select('*').order('created_at'),
-                    supabase.from('rocadeiras').select('*').order('created_at'),
-                    supabase.from('metas_rocadeiras').select('*'),
-                    supabase.from('tipos_servico').select('*').order('nome'),
-                    supabase.from('temas_dds').select('*').order('created_at'),
-                    supabase.from('registros_dds').select('*').order('created_at', { ascending: false }),
-                    supabase.from('banco_horas').select('*').order('nome'),
-                    supabase.from('app_config').select('*'),
-                ]);
+                ] = results;
+
+                if (e1) {
+                    setLoadError('Erro ao conectar ao banco: ' + e1.message + ' | URL: ' + import.meta.env.VITE_SUPABASE_URL);
+                    return;
+                }
 
                 setSetores(fromDbArray(d1));
                 setCargos(fromDbArray(d2));
@@ -116,7 +130,6 @@ export function DataProvider({ children }) {
                 setRegistrosDDS(fromDbArray(d14));
                 setBancoHorasState(fromDbArray(d15));
 
-                // Load configs
                 const configs = d16 || [];
                 const pc = configs.find(c => c.key === 'presenca_config');
                 const pm = configs.find(c => c.key === 'permissions_config');
@@ -124,6 +137,7 @@ export function DataProvider({ children }) {
                 setPermissionsConfigState(pm?.value || null);
             } catch (err) {
                 console.error('Error loading data:', err);
+                setLoadError(err.message);
             } finally {
                 setLoading(false);
             }
@@ -456,7 +470,7 @@ export function DataProvider({ children }) {
     }, []);
 
     const value = {
-        loading,
+        loading, loadError,
         fiscais, addFiscal, updateFiscal, deleteFiscal,
         funcionarios, addFuncionario, updateFuncionario, deleteFuncionario, getFuncionariosByFiscal,
         setores, addSetor, updateSetor, deleteSetor,
