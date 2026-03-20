@@ -16,7 +16,7 @@ export default function ControleRocadeiras() {
     const [search, setSearch] = useState('');
     const [modalOpen, setModalOpen] = useState(false);
     const [editItem, setEditItem] = useState(null);
-    const [form, setForm] = useState({ numeroSerie: '', operadorId: '', status: 'ativa', observacao: '' });
+    const [form, setForm] = useState({ numeroSerie: '', modelo: '', operadorId: '', status: 'ativa', observacao: '' });
     const [metaModalOpen, setMetaModalOpen] = useState(false);
     const [metaForms, setMetaForms] = useState({});
 
@@ -39,6 +39,7 @@ export default function ControleRocadeiras() {
         setEditItem(item);
         setForm({
             numeroSerie: item.numeroSerie || '',
+            modelo: item.modelo || '',
             operadorId: item.operadorId || '',
             status: item.status || 'ativa',
             observacao: item.observacao || '',
@@ -88,6 +89,7 @@ export default function ControleRocadeiras() {
             const q = search.toLowerCase();
             list = list.filter(r =>
                 r.numeroSerie.toLowerCase().includes(q) ||
+                (r.modelo || '').toLowerCase().includes(q) ||
                 getFuncName(r.operadorId).toLowerCase().includes(q)
             );
         }
@@ -379,7 +381,8 @@ export default function ControleRocadeiras() {
                         <table className="data-table">
                             <thead>
                                 <tr>
-                                    <th>Nº de Série</th>
+                                    <th>Nº Máquina</th>
+                                    <th>Modelo</th>
                                     <th>Status</th>
                                     <th>Operador</th>
                                     <th>Fiscal</th>
@@ -396,6 +399,7 @@ export default function ControleRocadeiras() {
                                     return (
                                         <tr key={r.id}>
                                             <td style={{ fontWeight: 700, fontFamily: 'monospace', fontSize: '0.9rem' }}>{r.numeroSerie}</td>
+                                            <td>{r.modelo ? <span className="badge badge-neutral">{r.modelo}</span> : '—'}</td>
                                             <td>
                                                 <span className={`badge ${statusInfo.badge}`}>{statusInfo.icon} {statusInfo.label}</span>
                                             </td>
@@ -430,9 +434,15 @@ export default function ControleRocadeiras() {
                     </>
                 }
             >
-                <div className="form-group">
-                    <label className="form-label">Número de Série *</label>
-                    <input className="form-input" value={form.numeroSerie} onChange={e => setForm({ ...form, numeroSerie: e.target.value })} placeholder="Ex: RC-2024-001" />
+                <div className="form-row">
+                    <div className="form-group">
+                        <label className="form-label">Nº da Máquina *</label>
+                        <input className="form-input" value={form.numeroSerie} onChange={e => setForm({ ...form, numeroSerie: e.target.value })} placeholder="Ex: 373984543" />
+                    </div>
+                    <div className="form-group">
+                        <label className="form-label">Modelo</label>
+                        <input className="form-input" value={form.modelo} onChange={e => setForm({ ...form, modelo: e.target.value })} placeholder="Ex: 220, 221" />
+                    </div>
                 </div>
                 <div className="form-row">
                     <div className="form-group">
